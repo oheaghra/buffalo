@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buffalo quiz</title>
+    <style>
+        body {
+            background-color:black;
+            background-image: url(buffalo2.png);
+            background-repeat: no-repeat;
+            background-position-x:center;
+            /* background-position-y: top; */               
+        }
+        #gameface {display:none;}
+        #setup p {color: white}
+        #bannertext {color: rgb(228, 220, 220);}
+        #gametext {color:white}
+        #gametext {text-align:center;
+                    font-size: 64px;
+                    padding: 200px 40px 0}
+        #quit {position:absolute; bottom: 10px;color:rgba(255, 0, 0, 0.438)}
+        #test {color: grey}
+    </style>
+</head>
+<body>
+    <div id='setup'>
+        <p> Select a file to start quiz</p>
+        <input type='file' id='inputfile' name='inputfile'>
+        <div id='output'></div>
+    </div>
+    <div id='gameface'>
+        <div id='banner'>
+            <p id='bannertext'>Hint</p>
+        </div>
+        <div id='gameshow'>
+            <p id='gametext'>Click screen <br> to begin</p>
+            <p id='test'></p>
+            <p id='quit'>Press X to quit</p>
+        </div>
+    </div>
+
+
+    <script>
+        var count = 0;
+        var hidden = "";
+        var lines = [];
+        var newlines = [];
+        document.getElementById('inputfile').addEventListener('change', function() {
+            var fr = new FileReader();
+            fr.onload = function() {
+                document.getElementById('output').textContent = fr.result;
+                hidden = fr.result;
+                console.log('h', hidden);
+                document.getElementById('gametext').innerHTML = "Click the buffalo to begin";
+            }
+            fr.readAsText(this.files[0]);
+            changescreen('setup','gameface');
+        })
+
+        function changescreen(old,gnu) {
+            document.getElementById(old).style.display='none';
+            document.getElementById(gnu).style.display='block';
+        }
+
+        document.addEventListener('click', function() {
+            newlines = [];
+            var sequence = [];
+            lines = document.getElementById('output').innerHTML.split('\n');
+            var pairs = lines.length / 2;
+            console.log('l', lines.length);
+            while (sequence.length < pairs) {
+                var n = Math.floor(Math.random() * pairs) * 2;
+                if (sequence.includes(n) == false) {
+                    sequence.push(n);
+                }
+            }
+                console.log(sequence);
+
+            for (i=0; i<sequence.length; i++ ) {
+                newlines.push(lines[sequence[i]]);
+                newlines.push(lines[1 + sequence[i]]);
+            }
+
+
+
+
+            console.log('nl', newlines.length);
+            document.getElementById('gametext').innerHTML = newlines[count];
+
+
+        })
+
+        document.addEventListener('keydown', function(e) {
+            var kee = e.key;
+            console.log(kee);
+            if (e.keyCode == 32) {    // if (kee == 'ArrowRight') {
+                count ++; 
+            } else if (kee == 'ArrowRight') {
+                count++;
+            } else if (kee == 'ArrowLeft') {
+                count--;
+            } else if (kee == 'x') {
+                exit();
+            }
+                console.log(count);
+                if (count >= lines.length) { count = 0; }
+                if (count < 0) { count = lines.length - 1}
+                document.getElementById('gametext').innerHTML = newlines[count];
+                if (count % 2 == 0) {document.getElementById('bannertext').innerHTML = 'Hint';
+                } else { document.getElementById("bannertext").innerHTML = "Answer"; }
+            
+        })
+
+        function exit() {
+            changescreen('gameface', 'setup');
+            var count = 0;
+            var hidden = "";
+            var lines = [];
+            var newlines = [];
+        }
+
+        // function setup() {
+        //     document.getElementById('gametext').innerHTML = newlines[count];
+        // }
+
+
+
+    </script>
+</body>
+</html>
